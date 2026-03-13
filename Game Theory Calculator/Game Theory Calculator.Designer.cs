@@ -261,7 +261,6 @@
             this.Canvas.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.Canvas.TabIndex = 6;
             this.Canvas.TabStop = false;
-            this.Canvas.Click += new System.EventHandler(this.Canvas_Click);
             this.Canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_Paint);
             this.Canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_MouseDown);
             this.Canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_MouseMove);

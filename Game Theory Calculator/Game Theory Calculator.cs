@@ -1,40 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Contexts;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace Game_Theory_Calculator
 {
     public partial class mainWindow : Form
     {
-        // Here I will initialise variables for all subroutines to make them easier to organise
+        public mainWindow()
+        {
+            InitializeComponent();
+            Canvas.MouseWheel += Canvas_MouseWheel;
+        }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            savedMaticies = new List<Matrix>();
+            existingConnections = new List<Connection>();
+        }
+
+        // Global Variables
+
+        // Placeholders and Saved Models
         private Matrix currentMatrix;
-        public List<Matrix> savedMaticies;
-        public Matrix movingMatrix;
-        public List<Connection> existingConnections;
-
+        private List<Matrix> savedMaticies;
         private Connection currentConnection;
-        public int newModelID = 0;
-        private int newConnectionID;
+        private List<Connection> existingConnections;
+
+        private Matrix movingMatrix;
         private Matrix destinationMatrix;
         private Node originNode;
         private Node currentNode;
+
+        // Integers for ID assignement
+        private int newModelID = 0;
+        private int newConnectionID = 0;
 
         private AdjustableArrowCap connectionArrow = new AdjustableArrowCap(5, 5);
 
         private float zoomDelta = 0.9f;
 
+        // Booleans that determine the mode of the program
         private bool connectionSelection;
         private bool panning = false;
         private bool matrixSelection = false;
@@ -46,8 +54,9 @@ namespace Game_Theory_Calculator
         private bool solvingConnection = false;
         private bool selectingMatrixToSolveConnection = false;
 
-        //here I will write all classes that I will use
+        // Classes
 
+        // General Model class
         public class Model
         {
             protected float masterX;
@@ -97,6 +106,7 @@ namespace Game_Theory_Calculator
             }
         }
 
+        // Matrix class 
         public class Matrix : Model
         {
             //define all variables
@@ -645,6 +655,7 @@ namespace Game_Theory_Calculator
             }
         }
 
+        //Connection class that is composed of nodes
         public class Connection
         {
             private List<LinkedList<Node>> connectedComponents;
@@ -776,6 +787,7 @@ namespace Game_Theory_Calculator
             }
         }
 
+        //Node class that can be either a cell of a matrix or a matrix itself
         public class Node : Model
         {
             private Model ModelReference;
@@ -823,6 +835,8 @@ namespace Game_Theory_Calculator
                 ModelReference = model;
             }
         }
+
+        //Points placeholders used for algorithms
         static class Points
         {
             public static PointF connectionStart;
@@ -835,6 +849,7 @@ namespace Game_Theory_Calculator
             public static PointF worldMouseCoord;
         }
 
+        //Class of fonts that will be used in the program
         static class Fonts
         {
             public static readonly Font text_font = new Font("Times New Roman", 11, FontStyle.Regular);
@@ -844,17 +859,6 @@ namespace Game_Theory_Calculator
             public static readonly Font origin_font = new Font("Times New Roman", 25, FontStyle.Bold);
         }
 
-        public mainWindow()
-        {
-            InitializeComponent();
-            Canvas.MouseWheel += Canvas_MouseWheel;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            savedMaticies = new List<Matrix>();
-            existingConnections = new List<Connection>();
-        }
 
         // This subroutine will handle the initialisation of a new matrix
         private void MatrixInitialise_Click(object sender, EventArgs e)
@@ -869,6 +873,7 @@ namespace Game_Theory_Calculator
             }
         }
 
+        // This subroutine will ensure that the matricies do not collide
         public void localise_matrix(Matrix matrix)
         {
             bool positionVerified = false;
@@ -884,6 +889,7 @@ namespace Game_Theory_Calculator
             }
         }
 
+        // This subroutine shifts the matrix until it's bounds do not intersect with other matricies
         private bool UpdateLocation(Matrix matrix)
         {
             foreach (Matrix matrixInLoop in savedMaticies)
@@ -899,6 +905,7 @@ namespace Game_Theory_Calculator
             return true;
         }
 
+        // This subroutine calls the matrix modifiaction window and passes it the matrix and then recieves it and saves it
         public void editMatrix(Matrix matrix)
         {
             currentMatrix = matrix;
@@ -907,6 +914,7 @@ namespace Game_Theory_Calculator
             Canvas.Invalidate();
         }
 
+        // This subroutine opens the matrix modification window
         private MatrixModification OpenMatrixEditWindow()
         {
             EditingMatrix = true;
@@ -916,6 +924,7 @@ namespace Game_Theory_Calculator
             return MM;
         }
 
+        // This subroutine saves the changes of the matrix and updates the connected structures based on the changes
         private void SaveMatrixModification(MatrixModification MM)
         {
             while (EditingMatrix)
@@ -955,17 +964,14 @@ namespace Game_Theory_Calculator
                 }
             }
         }
+
+        // This soubrutine opens a pre-recorded tutorial video
         private void tutorialButton_Click(object sender, EventArgs e)
         {
-
             System.Diagnostics.Process.Start("https://www.youtube.com/watch?v=rA57mAI6cKc");
-
         }
 
-        private void Canvas_Click(object sender, EventArgs e)
-        {
-
-        }
+        // This subroutine handles mouse movement on the canvas
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDragged && movingMatrix != null)
@@ -976,7 +982,6 @@ namespace Game_Theory_Calculator
             {
                 PanCanvas(e);
             }
-
         }
 
         private void DragMatrix(MouseEventArgs e)
@@ -1636,8 +1641,6 @@ namespace Game_Theory_Calculator
                 MessageBox.Show("Connection Initialised, Please select cells and matricies that you would like to connect");
             }
         }
-
-        //now i will add methods for easier canvas navigation 
 
         // origin is the red dot in the top left corner next to which matricies appear when they are initialised
         private void return_to_origin_Click(object sender, EventArgs e)
