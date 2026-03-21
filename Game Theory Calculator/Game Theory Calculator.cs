@@ -19,13 +19,13 @@ namespace Game_Theory_Calculator
 
         // Placeholders and Saved Models
 
-        private Matrix currentMatrix;
-        private List<Matrix> savedMaticies;
+        private GameTheoryMatrix currentMatrix;
+        private List<GameTheoryMatrix> savedMaticies;
         private Connection currentConnection;
         private List<Connection> existingConnections;
 
-        private Matrix movingMatrix;
-        private Matrix destinationMatrix;
+        private GameTheoryMatrix movingMatrix;
+        private GameTheoryMatrix destinationMatrix;
         private Node originNode;
         private Node currentNode;
 
@@ -51,818 +51,11 @@ namespace Game_Theory_Calculator
         private bool solvingConnection = false;
         private bool selectingMatrixToSolveConnection = false;
 
-        // Classes
-
-        // General Model class
-        public class Model
-        {
-            protected float masterX;
-            protected float masterY;
-            protected string[] players;
-            protected string name;
-            protected int ID;
-            protected string defaultName = "Default Name";
-
-            public string[] GetPlayers()
-            {
-                return players;
-            }
-
-            public string GetOnePlayer(int index)
-            {
-                return players[index];
-            }
-
-            public void SetPlayers(string[] Players)
-            {
-                players = Players;
-            }
-
-            public void SetOnePlayer(int index, string Player)
-            {
-                players[index] = Player;
-            }
-            public string GetName()
-            {
-                return name;
-            }
-
-            public void SetName(string Name)
-            {
-                name = Name;
-            }
-
-            public int GetID()
-            {
-                return ID;
-            }
-
-            public void SetID(int ID)
-            {
-                this.ID = ID;
-            }
-        }
-
-        // Matrix class 
-        public class Matrix : Model
-        {
-            //define all variables
-            private int rows;
-            private int cols;
-            private string[,] payoffs;
-            private string[] rowStrategies;
-            private string[] colStrategies;
-            private Stack<Matrix> versionsStack;
-            private RectangleF hitbox;
-            private float cellHeight = 60;
-            private float cellWidth = 100;
-            private bool moving;
-            private const int cellBuffer = 5; //constant
-
-            private float gridWidth;
-            private float gridHight;
-            private float rowYcord;
-            private float colXcrd;
-            private float colYcrd;
-            private float rowXcrd;
-            private int connectionOutcomeRowIndeex;
-            private int connectionOutcomeColIndeex;
-
-            private RectangleF currentGrid;
-            private RectangleF rowStrategyRectangle;
-            private RectangleF cellRectangle;
-            private RectangleF colStrategyRectangle;
-
-            private bool[,] Player1BestResponses;
-            private bool[,] Player2BestResponses;
-            private float[,] Player1Payoffs;
-            private float[,] Player2Payoffs;
-            private List<string> NashEqualibria = new List<string>();
-
-
-            public Matrix(int Rows, int Cols, string[,] Payoffs, string[] RowStrategies, string[] ColStrategies, string Name, Stack<Matrix> VersionsStack, string[] Players, float X, float Y, RectangleF Hitbox)
-            {
-                rows = Rows;
-                cols = Cols;
-                payoffs = Payoffs;
-                rowStrategies = RowStrategies;
-                colStrategies = ColStrategies;
-                name = Name;
-                versionsStack = VersionsStack;
-                players = Players;
-                masterY = Y;
-                masterX = X;
-                hitbox = Hitbox;
-            }
-
-            public Matrix()
-            {
-                //default constructor that allows the program to go to the default matrix
-            }
-            public int GetRows()
-            {
-                return rows;
-            }
-
-            public void SetRows(int Rows)
-            {
-                rows = Rows;
-            }
-
-            public void ChangeRows(int Rows)
-            {
-                rows += Rows;
-            }
-
-            public int GetCols()
-            {
-                return cols;
-            }
-
-            public void SetCols(int Cols)
-            {
-                cols = Cols;
-            }
-
-            public void ChangeCols(int Cols)
-            {
-                cols += Cols;
-            }
-
-            public string[,] GetPayoffs()
-            {
-                return payoffs;
-            }
-
-            public string GetOnePayoff(int row, int col)
-            {
-                return payoffs[row, col];
-            }
-
-            public void SetPayoffs(string[,] newPayoff)
-            {
-                payoffs = newPayoff;
-            }
-
-            public void SetOnePayoff(int Row, int Col, string newPayoff)
-            {
-                payoffs[Row, Col] = newPayoff;
-            }
-
-            public string[] GetRowStrategies()
-            {
-                return rowStrategies;
-            }
-
-            public string GetOneRowStrategy(int index)
-            {
-                return rowStrategies[index];
-            }
-
-            public void SetRowStrategies(string[] strategy)
-            {
-                rowStrategies = strategy;
-            }
-
-            public void SetOneRowStrategy(int index, string strategy)
-            {
-                rowStrategies[index] = strategy;
-            }
-
-            public string[] GetColStrategies()
-            {
-                return colStrategies;
-            }
-
-            public string GetOneColStrategy(int index)
-            {
-                return colStrategies[index];
-            }
-            public void SetColStrategies(string[] strategy)
-            {
-                colStrategies = strategy;
-            }
-
-            public void SetOneColStrategy(int index, string strategy)
-            {
-                colStrategies[index] = strategy;
-            }
-            public Stack<Matrix> GetVersionStack()
-            {
-                return versionsStack;
-            }
-
-            public void SetVersionStack(Stack<Matrix> Stack)
-            {
-                versionsStack = Stack;
-            }
-
-            public void PushVersionStack(Matrix pushedMatrix)
-            {
-                versionsStack.Push(pushedMatrix);
-            }
-
-            public Matrix PopVersionStack()
-            {
-                return versionsStack.Pop();
-            }
-
-            public float GetX()
-            {
-                return masterX;
-            }
-
-            public void SetX(float X)
-            {
-                masterX = X;
-            }
-
-            public void ChangeX(float X)
-            {
-                masterX += X;
-            }
-
-            public float GetY()
-            {
-                return masterY;
-            }
-
-            public void SetY(float Y)
-            {
-                masterY = Y;
-            }
-
-            public void ChangeY(float Y)
-            {
-                masterY += Y;
-            }
-            public RectangleF GetHitbox()
-            {
-                return hitbox;
-            }
-
-            public void SetHitbox(RectangleF Hitbox)
-            {
-                hitbox = Hitbox;
-            }
-
-            public bool IsMoving()
-            {
-                return moving;
-            }
-
-            public void SetIsMoving(bool Moving)
-            {
-                moving = Moving;
-            }
-
-            public float GetCellHeight()
-            {
-                return cellHeight;
-            }
-
-            public void SetCellHeight(float cellHeight)
-            {
-                this.cellHeight = cellHeight;
-            }
-
-            public float GetCellWidth()
-            {
-                return cellWidth;
-            }
-
-            public void SetCellWidth(float cellWidth)
-            {
-                this.cellWidth = cellWidth;
-            }
-            public float GetCellBuffer()
-            {
-                return cellBuffer;
-            }
-
-            public float GetGridWidth()
-            {
-                return gridWidth;
-            }
-
-            public void SetGridWidth(float GridWidth)
-            {
-                gridWidth = GridWidth;
-            }
-
-            public float GetGridHight()
-            {
-                return gridHight;
-            }
-
-            public void SetGridHight(float GridHight)
-            {
-                gridHight = GridHight;
-            }
-            public float GetRowYCord()
-            {
-                return rowYcord;
-            }
-            public void SetRowYCord(float rowYcord)
-            {
-                this.rowYcord = rowYcord;
-            }
-
-            public float GetColXCord()
-            {
-                return colXcrd;
-            }
-
-            public void SetColXCord(float ColXCord)
-            {
-                colXcrd = ColXCord;
-            }
-            public float DetermineCellWidth(Graphics g, Matrix matrix, Font text_font, Font payoff_font)
-            {
-                float contentWidth = LongestCol(matrix, g, text_font, payoff_font);
-                float cellWidth = Math.Max(100, contentWidth + (cellBuffer * 2));
-                return (cellWidth);
-            }
-
-            public float GetColYCord()
-            {
-                return rowYcord;
-            }
-            public void SetColYCord(float colYcrd)
-            {
-                this.colYcrd = colYcrd;
-            }
-
-            public float GetRowXCord()
-            {
-                return rowXcrd;
-            }
-            public void SetRowXCord(float rowXcord)
-            {
-                rowXcrd = rowXcord;
-            }
-
-            public void SetCurrentGrid(RectangleF rect)
-            {
-                currentGrid = rect;
-            }
-
-            public RectangleF GetCurrentGrid()
-            {
-                return currentGrid;
-            }
-
-            public void SetRowStrategyRectangle(RectangleF rect)
-            {
-                rowStrategyRectangle = rect;
-            }
-
-            public RectangleF GetRowStrategyRectangle()
-            {
-                return rowStrategyRectangle;
-            }
-            public void SetColStrategyRectangle(RectangleF rect)
-            {
-                colStrategyRectangle = rect;
-            }
-
-            public RectangleF GetColStrategyRectangle()
-            {
-                return colStrategyRectangle;
-            }
-
-            public void SetCellRectangle(RectangleF rect)
-            {
-                cellRectangle = rect;
-            }
-
-            public RectangleF GetCellRectangle()
-            {
-                return cellRectangle;
-            }
-
-            public bool[,] GetPlayer1BestResponses()
-            {
-                return Player1BestResponses;
-            }
-
-            public bool GetOnePlayer1BestResponse(int row, int col)
-            {
-                return Player1BestResponses[row, col];
-            }
-
-            public void SetPlayer1BestResponses(bool[,] Player1BestResponses)
-            {
-                this.Player1BestResponses = Player1BestResponses;
-            }
-
-            public void SetOnePlayer1BestResponse(int row, int col, bool value)
-            {
-                Player1BestResponses[row, col] = value;
-            }
-
-            public bool[,] GetPlayer2BestResponses()
-            {
-                return Player2BestResponses;
-            }
-
-            public bool GetOnePlayer2BestResponse(int row, int col)
-            {
-                return Player2BestResponses[row, col];
-            }
-
-            public void SetPlayer2BestResponses(bool[,] Player2BestResponses)
-            {
-                this.Player2BestResponses = Player2BestResponses;
-            }
-            public void SetOnePlayer2BestResponse(int row, int col, bool value)
-            {
-                Player2BestResponses[row, col] = value;
-            }
-
-            public float[,] GetPlayer1Payoffs()
-            {
-                return Player1Payoffs;
-            }
-
-            public float GetOnePlayer1Payoff(int row, int col)
-            {
-                return Player1Payoffs[row, col];
-            }
-
-            public float GetOnePlayer2Payoff(int row, int col)
-            {
-                return Player2Payoffs[row, col];
-            }
-
-            public void SetPlayer1Payoffs(float[,] Player1Payoffs)
-            {
-                this.Player1Payoffs = Player1Payoffs;
-            }
-
-            public float[,] GetPlayer2Payoffs()
-            {
-                return Player2Payoffs;
-            }
-
-            public void SetPlayer2Payoffs(float[,] Player2Payoffs)
-            {
-                this.Player2Payoffs = Player2Payoffs;
-            }
-
-            public List<string> GetNashEqualibria()
-            {
-                return NashEqualibria;
-            }
-
-            public void SetNashEqualibria(List<string> nashequalibria)
-            {
-                NashEqualibria = nashequalibria;
-            }
-
-            public void AddToNashEqualibria(string output)
-            {
-                NashEqualibria.Add(output);
-            }
-
-            public int GetconnectionRowIndeex()
-            {
-                return connectionOutcomeRowIndeex;
-            }
-
-            public void SetConnectionRowIndeex(int index)
-            {
-                connectionOutcomeRowIndeex = index;
-            }
-            public int GetconnectionColIndeex()
-            {
-                return connectionOutcomeColIndeex;
-            }
-
-            public void SetConnectionColIndeex(int index)
-            {
-                connectionOutcomeColIndeex = index;
-            }
-
-            public float LongestCol(Matrix matrix, Graphics g, Font text_font, Font payoff_font)
-            {
-                float maxWidth = 0;
-                foreach (string s in matrix.GetColStrategies())
-                {
-                    SizeF size = g.MeasureString(s, text_font);
-                    if (size.Width > maxWidth)
-                    {
-                        maxWidth = size.Width;
-                    }
-                }
-
-                for (int r = 0; r < matrix.GetRows(); r++)
-                {
-                    for (int c = 0; c < matrix.GetCols(); c++)
-                    {
-                        string text = matrix.GetOnePayoff(r, c);
-
-                        SizeF size = g.MeasureString(text, payoff_font);
-                        if (size.Width > maxWidth)
-                        {
-                            maxWidth = size.Width;
-                        }
-                    }
-                }
-
-                return maxWidth;
-
-            }
-            public void ConvertPayoffsToFloat(Matrix matrix, float[,] Player1Payoffs, float[,] Player2Payoffs, List<string> NashEqualibria)
-            {
-                for (int row = 0; row < matrix.GetRows(); row++)
-                {
-                    for (int column = 0; column < matrix.GetCols(); column++)
-                    {
-                        string stringPayoff = matrix.GetOnePayoff(row, column);
-                        string[] parts = stringPayoff.Split(':');
-
-                        Player1Payoffs[row, column] = float.Parse(parts[0]);
-                        Player2Payoffs[row, column] = float.Parse(parts[1]);
-
-                        NashEqualibria = new List<string>(); //tenporary output
-                    }
-                }
-            }
-            public int[] IdentifyCellClicked(PointF mousePointer)
-            {
-                int[] indecies = new int[2];
-                float horisontalCellBound = masterX + cellWidth;
-                float verticalCellBound = masterY + cellHeight;
-
-                int colIndex = (int)((mousePointer.X - horisontalCellBound) / cellWidth);
-                int rowIndex = (int)((mousePointer.Y - verticalCellBound) / cellHeight);
-
-                if (rowIndex >= 0 && rowIndex < rows && colIndex >= 0 && colIndex < cols)
-                {
-                    indecies[0] = rowIndex;
-                    indecies[1] = colIndex;
-                    return (indecies);
-                }
-
-                indecies[0] = -1;
-                indecies[1] = -1;
-
-                return indecies;
-            }
-            public void CalculateMatrixBounds(Matrix matrix, Graphics g, Font text_font, Font payoff_font)
-            {
-                float currentCellHeight = matrix.GetCellHeight();
-                float currentCellWidth = matrix.DetermineCellWidth(g, matrix, text_font, payoff_font);
-                float totalWidth = (matrix.GetCols() * currentCellWidth) + currentCellWidth;
-                float totalHeight = (matrix.GetRows() * currentCellHeight) + currentCellHeight;
-                hitbox = new RectangleF(matrix.GetX(), matrix.GetY(), totalWidth + 30f, totalHeight + 30f);
-            }
-
-
-            public Matrix defaultMatrix(List<Matrix> savedMatricies, int count)
-            {
-                string[,] defaultPayoffs = { { "3:3", "0:4" }, { "4:0", "2:2" } };
-                string[] defaultRowStrategies = { "Cooperate", "Defect" };
-                string[] defaultColStrategies = { "Cooperate", "Defect" };
-                string[] defaultPlayers = { "Player 1", "Player 2" };
-
-                foreach (Matrix matrix in savedMatricies)
-                {
-                    if (savedMatricies.Count == 0)
-                    {
-                        break;
-                    }
-                    else if (matrix.GetName() == "Default Name")
-                    {
-                        defaultName = "Default Name (" + count + ")";
-                        break;
-                    }
-                    else
-                    {
-                        defaultName = "Default Name";
-                        break;
-                    }
-
-                }
-                Stack<Matrix> defaultStack = new Stack<Matrix>();
-                RectangleF defaultRectangle = new RectangleF();
-                Matrix defaultMatrix = new Matrix(2, 2, defaultPayoffs, defaultRowStrategies, defaultColStrategies, defaultName, defaultStack, defaultPlayers, 150, 80, defaultRectangle);
-                return defaultMatrix;
-            }
-        }
-
-        //Connection class that is composed of nodes
-        public class Connection
-        {
-            private List<LinkedList<Node>> connectedComponents;
-            private int connectionID;
-            private Model rootModel;
-
-            public Connection(int newID)
-            {
-                connectedComponents = new List<LinkedList<Node>>();
-                connectionID = newID;
-                rootModel = null;
-            }
-
-            public int GetConnectionID()
-            {
-                return connectionID;
-            }
-
-            public List<LinkedList<Node>> GetConnectedComponents()
-            {
-                return connectedComponents;
-            }
-
-            public void AddConection(Model originModel, Model destinationModel, int originRow, int originCol)
-            {
-                LinkedList<Node> link = GetLinkOfCell(originModel, originRow, originCol);
-
-                if (link == null)
-                {
-                    link = new LinkedList<Node>();
-                    link.AddFirst(new Node(originModel, originRow, originCol));
-                    link.AddLast(new Node(destinationModel));
-                    connectedComponents.Add(link);
-                }
-                else
-                {
-                    if (!CheckChainForDestination(link, destinationModel))
-                    {
-                        link.AddLast(new Node(destinationModel));
-                    }
-                }
-            }
-
-            public LinkedList<Node> GetLinkOfCell(Model originModel, int originRow, int originCol)
-            {
-                foreach (var nodesList in connectedComponents)
-                {
-                    Node listHead = nodesList.First.Value;
-
-                    if (listHead.GetModelReference() == originModel)
-                    {
-                        if (listHead.GetRowIndex() == originRow && listHead.GetColIndex() == originCol)
-                        {
-                            return nodesList;
-                        }
-                    }
-                }
-                return null;
-            }
-
-            private bool CheckChainForDestination(LinkedList<Node> link, Model target)
-            {
-                foreach (var node in link)
-                {
-                    if (node != link.First.Value && node.GetModelReference() == target)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            public void RemoveConnection(Model origin, int row, int col, Model destination)
-            {
-                LinkedList<Node> link = GetLinkOfCell(origin, row, col);
-
-                if (link != null)
-                {
-                    Node nodeToRemove = null;
-                    foreach (Node node in link)
-                    {
-
-                        if (node == link.First.Value)
-                        {
-                            continue;
-                        }
-
-                        if (node.GetModelReference() == destination)
-                        {
-                            nodeToRemove = node;
-                            break;
-                        }
-                    }
-
-                    if (nodeToRemove != null)
-                    {
-                        link.Remove(nodeToRemove);
-                    }
-
-                    if (link.Count == 1)
-                    {
-                        connectedComponents.Remove(link);
-                    }
-                }
-            }
-
-            public void RefreshRefference(Model previousVersion, Model newVersion)
-            {
-                foreach (LinkedList<Node> link in connectedComponents)
-                {
-                    foreach (Node node in link)
-                    {
-                        if (node.GetModelReference() == previousVersion)
-                        {
-                            node.SetModelReference(newVersion);
-                        }
-                    }
-                }
-            }
-
-            public Model GetRootModel()
-            {
-                return rootModel;
-            }
-
-            public void SetRootModel(Model rootModel)
-            {
-                this.rootModel = rootModel;
-            }
-        }
-
-        //Node class that can be either a cell of a matrix or a matrix itself
-        public class Node : Model
-        {
-            private Model ModelReference;
-            private int RowIndex;
-            private int ColIndex;
-
-            public Model GetModelReference()
-            {
-                return ModelReference;
-            }
-
-            public void SetModelReference(Model modelRef)
-            {
-                ModelReference = modelRef;
-            }
-
-            public int GetRowIndex()
-            {
-                return RowIndex;
-            }
-
-            public void SetRowIndex(int rowIndex)
-            {
-                RowIndex = rowIndex;
-            }
-
-            public int GetColIndex()
-            {
-                return ColIndex;
-            }
-
-            public void SetColIndex(int colIndex)
-            {
-                ColIndex = colIndex;
-            }
-            public Node(Model model, int row, int col)
-            {
-                ModelReference = model;
-                RowIndex = row;
-                ColIndex = col;
-            }
-
-            public Node(Model model)
-            {
-                ModelReference = model;
-            }
-        }
-
-        //Points placeholders used for algorithms
-        static class Points
-        {
-            public static PointF connectionStart;
-            public static PointF connectionEnd;
-            public static PointF zoomFocus = new PointF(0, 0);
-            public static PointF originPoint = new PointF(0, 0);
-            public static PointF selectPoint = new PointF(0, 0);
-            public static PointF startingPosition = new PointF(0, 0);
-            public static PointF previousPoint;
-            public static PointF worldMouseCoord;
-        }
-
-        //Class of fonts that will be used in the program
-        static class Fonts
-        {
-            public static readonly Font text_font = new Font("Times New Roman", 11, FontStyle.Regular);
-            public static readonly Font payoff_font = new Font("Times New Roman", 12, FontStyle.Regular);
-            public static readonly Font player_font = new Font("Times New Roman", 12, FontStyle.Bold);
-            public static readonly Font name_font = new Font("Times New Roman", 14, FontStyle.Italic);
-            public static readonly Font origin_font = new Font("Times New Roman", 25, FontStyle.Bold);
-        }
-
-
-
         // Setup subroutines
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            savedMaticies = new List<Matrix>();
+            savedMaticies = new List<GameTheoryMatrix>();
             existingConnections = new List<Connection>();
         }
 
@@ -871,7 +64,7 @@ namespace Game_Theory_Calculator
         {
             if (!stopBRESelection())
             {
-                currentMatrix = new Matrix();
+                currentMatrix = new GameTheoryMatrix();
                 currentMatrix = currentMatrix.defaultMatrix(savedMaticies, newModelID);
                 currentMatrix.SetID(newModelID);
                 newModelID++;
@@ -880,7 +73,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine calls the matrix modifiaction window and passes it the matrix and then recieves it and saves it
-        public void editMatrix(Matrix matrix)
+        private void editMatrix(GameTheoryMatrix matrix)
         {
             currentMatrix = matrix;
             MatrixModification MM = OpenMatrixEditWindow();
@@ -944,7 +137,7 @@ namespace Game_Theory_Calculator
         // Matrix Location Subroutines
 
         // This subroutine will ensure that the matricies do not collide
-        public void localise_matrix(Matrix matrix)
+        private void localise_matrix(GameTheoryMatrix matrix)
         {
             bool positionVerified = false;
 
@@ -960,9 +153,9 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine shifts the matrix once when it's bounds intersect with other matricies
-        private bool UpdateLocation(Matrix matrix)
+        private bool UpdateLocation(GameTheoryMatrix matrix)
         {
-            foreach (Matrix matrixInLoop in savedMaticies)
+            foreach (GameTheoryMatrix matrixInLoop in savedMaticies)
             {
                 if (matrixInLoop == matrix) continue;
                 if (matrix.GetHitbox().IntersectsWith(matrixInLoop.GetHitbox()))
@@ -978,7 +171,7 @@ namespace Game_Theory_Calculator
         // This subroutine checks that the new location of a matrix does not contain another matrix
         private bool CheckLocationForMatrix(Graphics g)
         {
-            foreach (Matrix savedMatrix in savedMaticies)
+            foreach (GameTheoryMatrix savedMatrix in savedMaticies)
             {
                 {
                     //avoid checking coordinates of the dragged matrix with it's old position
@@ -1034,7 +227,7 @@ namespace Game_Theory_Calculator
             using (Graphics g = this.CreateGraphics())
             {
 
-                foreach (Matrix matrix in savedMaticies)
+                foreach (GameTheoryMatrix matrix in savedMaticies)
                 {
                     if (matrix != null)
                     {
@@ -1069,7 +262,7 @@ namespace Game_Theory_Calculator
                             {
                                 destinationMatrix = matrix;
                                 chossingMatrixToDeleteConnection = false;
-                                ComponentDeletion((Matrix)originNode.GetModelReference(), originNode.GetRowIndex(), originNode.GetColIndex(), destinationMatrix);
+                                ComponentDeletion((GameTheoryMatrix)originNode.GetModelReference(), originNode.GetRowIndex(), originNode.GetColIndex(), destinationMatrix);
                             }
                             else if (choosingMatrixToDeleteEntireConnection)
                             {
@@ -1233,7 +426,7 @@ namespace Game_Theory_Calculator
         // This subroutine draws all existing matricies each time a canvas is updated
         private void DrawAllMatricies(PaintEventArgs e)
         {
-            foreach (Matrix matrix in savedMaticies)
+            foreach (GameTheoryMatrix matrix in savedMaticies)
             {
                 if (matrix != null)
                 {
@@ -1257,7 +450,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine draws a matrix on a canvas which is passed as a parameter
-        private void DrawMatrix(Graphics g, Matrix matrix)
+        private void DrawMatrix(Graphics g, GameTheoryMatrix matrix)
         {
             if (matrix != null)
             {
@@ -1270,7 +463,7 @@ namespace Game_Theory_Calculator
 
                 DrawGridOuterBounds(matrix.GetCurrentGrid(), g);
 
-                FillCells(g, matrix);
+                FillGrid(g, matrix);
 
                 using (Pen gridPen = new Pen(Color.Black, 1))
                 using (StringFormat format = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
@@ -1322,7 +515,7 @@ namespace Game_Theory_Calculator
 
                     originNode = chain.First.Value;
                     currentNode = chain.First.Next.Value;
-                    Matrix originMatrix = (Matrix)originNode.GetModelReference();
+                    GameTheoryMatrix originMatrix = (GameTheoryMatrix)originNode.GetModelReference();
 
                     Points.connectionStart = CellCenter(g, originMatrix, originNode.GetRowIndex(), originNode.GetColIndex());
                     Points.connectionStart.X += 30;
@@ -1330,7 +523,7 @@ namespace Game_Theory_Calculator
 
                     while (currentNode != null)
                     {
-                        destinationMatrix = (Matrix)currentNode.GetModelReference();
+                        destinationMatrix = (GameTheoryMatrix)currentNode.GetModelReference();
 
                         Points.connectionEnd = MatrixNameLocation(destinationMatrix);
                         Points.connectionEnd.X -= g.MeasureString(destinationMatrix.GetName(), Fonts.name_font).Width / 2;
@@ -1366,13 +559,13 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine fills the background of the matrix cells with white colour
-        public void FillCells(Graphics g, Matrix matrix)
+        public void FillGrid(Graphics g, GameTheoryMatrix matrix)
         {
             g.FillRectangle(Brushes.White, matrix.GetCurrentGrid());
         }
 
         // This subroutine draws names of the players and the name of the matrix
-        private void DrawNames(Matrix matrix, Graphics g, float cellWidth, float gridW, StringFormat format, float cellHeight, float gridH)
+        private void DrawNames(GameTheoryMatrix matrix, Graphics g, float cellWidth, float gridW, StringFormat format, float cellHeight, float gridH)
         {
             g.DrawString(matrix.GetOnePlayer(0), Fonts.player_font, Brushes.Black, new PointF(matrix.GetX() - (g.MeasureString(matrix.GetOnePlayer(0), Fonts.player_font).Width / 2) - matrix.GetCellBuffer(), matrix.GetY() + cellHeight + (gridH / 2)), format); // I couldnt work out how to allign the name vertically as it cept on clashing with strategies so I asked Gemeni for a robust maths that ensures perfect allignment 
             g.DrawString(matrix.GetOnePlayer(1), Fonts.payoff_font, Brushes.Black, new PointF(matrix.GetX() + cellWidth + (gridW / 2), matrix.GetY() - 10), format);
@@ -1393,19 +586,19 @@ namespace Game_Theory_Calculator
         }
 
         // This soubroutine draws boarders of individual cell
-        private void DrawGridInnerBounds(Pen gridPen, float colXcrd, float rowYcord, float cellWidth, float cellHight, Graphics g, Matrix matrix)
+        private void DrawGridInnerBounds(Pen gridPen, float colXcrd, float rowYcord, float cellWidth, float cellHight, Graphics g, GameTheoryMatrix matrix)
         {
             g.DrawRectangle(gridPen, colXcrd, rowYcord, cellWidth, matrix.GetCellHeight());
         }
 
         // This subroutine draws one strategy name in a matrix
-        private void DrawOneStrategy(Matrix matrix, int x, RectangleF rowStrategies, StringFormat format, Graphics g)
+        private void DrawOneStrategy(GameTheoryMatrix matrix, int x, RectangleF rowStrategies, StringFormat format, Graphics g)
         {
             g.DrawString(matrix.GetOneRowStrategy(x), Fonts.text_font, Brushes.Black, rowStrategies, format);
         }
 
         // This subroutine draws one payoff within one cell of a matrix
-        private void DrawOnePayoff(Matrix matrix, int r, int c, RectangleF cellPic, StringFormat format, Graphics g)
+        private void DrawOnePayoff(GameTheoryMatrix matrix, int r, int c, RectangleF cellPic, StringFormat format, Graphics g)
         {
             g.DrawString(matrix.GetOnePayoff(r, c), Fonts.payoff_font, Brushes.Black, cellPic, format);
         }
@@ -1437,7 +630,7 @@ namespace Game_Theory_Calculator
             }
         }
         // This subroutine connects a cell of a matrix and a matrix according to user selection
-        public void ConnectionModelSelection(Matrix model)
+        public void ConnectionModelSelection(GameTheoryMatrix model)
         {
             if (connectionSelection && currentConnection != null)
             {
@@ -1463,7 +656,7 @@ namespace Game_Theory_Calculator
                     else
                     {
 
-                        currentMatrix = (Matrix)currentConnection.GetRootModel();
+                        currentMatrix = (GameTheoryMatrix)currentConnection.GetRootModel();
                         currentConnection.AddConection(currentMatrix, model, currentMatrix.GetconnectionRowIndeex(), currentMatrix.GetconnectionColIndeex());
                         currentConnection.SetRootModel(null);
                         Canvas.Invalidate();
@@ -1473,7 +666,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine determines the center of the cell that is within a connection which is used for drawing a connecting arrow
-        private PointF CellCenter(Graphics g, Matrix matrix, int row, int col)
+        private PointF CellCenter(Graphics g, GameTheoryMatrix matrix, int row, int col)
         {
             float centerX = matrix.GetX() + matrix.GetCellWidth() + (col * matrix.GetCellWidth()) + (matrix.GetCellWidth() / 2);
             float centerY = matrix.GetY() + matrix.GetCellHeight() + (row * matrix.GetCellHeight()) + (matrix.GetCellHeight() / 2);
@@ -1482,13 +675,13 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine determines the location of the matrix name within a connection which is used for drawing a connecting arrow
-        private PointF MatrixNameLocation(Matrix matrix)
+        private PointF MatrixNameLocation(GameTheoryMatrix matrix)
         {
             return new PointF(matrix.GetX(), matrix.GetY());
         }
 
         // This subroutine prevents a cell being connected to more than one matrix to prevent errors
-        private bool CellConnected(Matrix matrix, int row, int col)
+        private bool CellConnected(GameTheoryMatrix matrix, int row, int col)
         {
             foreach (Connection connection in existingConnections)
             {
@@ -1525,7 +718,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine deletes a matrix from a connection
-        private void ComponentDeletion(Matrix originMatrix, int row, int col, Matrix destinationMatrix)
+        private void ComponentDeletion(GameTheoryMatrix originMatrix, int row, int col, GameTheoryMatrix destinationMatrix)
         {
             for (int i = existingConnections.Count - 1; i >= 0; i--)
             {
@@ -1560,7 +753,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine deletes the whole connection by selection one of its components
-        private void DeleteAllNodes(Matrix matrix)
+        private void DeleteAllNodes(GameTheoryMatrix matrix)
         {
             bool connectionDeleted = false;
 
@@ -1594,7 +787,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine identifies a connection which contains the matrix that was passed as a parameter
-        private bool FindConnectionContainingMatrix(Connection connection, Matrix matrix)
+        private bool FindConnectionContainingMatrix(Connection connection, GameTheoryMatrix matrix)
         {
             foreach (LinkedList<Node> link in connection.GetConnectedComponents())
             {
@@ -1663,7 +856,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine is a collection of method calls that make up the BRE algorithm 
-        public void BestResponceEnumeration(Matrix matrix)
+        private void BestResponceEnumeration(GameTheoryMatrix matrix)
         {
             if (!solvingConnection)
             {
@@ -1697,7 +890,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine prepares the data structures needed for BRE
-        private void CreateDataStrucutresForBRE(Matrix matrix)
+        private void CreateDataStrucutresForBRE(GameTheoryMatrix matrix)
         {
             matrix.SetPlayer1BestResponses(new bool[matrix.GetRows(), matrix.GetCols()]);
             matrix.SetPlayer2BestResponses(new bool[matrix.GetRows(), matrix.GetCols()]);
@@ -1707,7 +900,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine fixes the column strategy and finds the row which maximises the payoffs of the player with row strategies
-        private void RowPlayerBRE(Matrix matrix)
+        private void RowPlayerBRE(GameTheoryMatrix matrix)
         {
             for (int col = 0; col < matrix.GetCols(); col++)
             {
@@ -1738,7 +931,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine fixes the row strategy and finds the column which maximises the payoffs of the player with column strategies
-        private void ColPlayerBRE(Matrix matrix)
+        private void ColPlayerBRE(GameTheoryMatrix matrix)
         {
             for (int row = 0; row < matrix.GetRows(); row++)
             {
@@ -1764,7 +957,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine finds the cells where the best responding strategies for both players intersect
-        private void FindIntersectionsOfBRE(Matrix matrix)
+        private void FindIntersectionsOfBRE(GameTheoryMatrix matrix)
         {
             for (int r = 0; r < matrix.GetRows(); r++)
             {
@@ -1780,7 +973,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine returns a text output of the BRE algorithm
-        private void ReturnBREResults(Matrix matrix)
+        private void ReturnBREResults(GameTheoryMatrix matrix)
         {
             if (matrix.GetNashEqualibria().Count > 0)
             {
@@ -1800,17 +993,17 @@ namespace Game_Theory_Calculator
         // Connection Solving methods
 
         // This subroutine aggregates the order of solving individual matricies in a connection and returns all final Nash Equalibria
-        private void TraverseConnectionToNash(Matrix matrix)
+        private void TraverseConnectionToNash(GameTheoryMatrix matrix)
         {
             MessageBox.Show("The connection which starts at matrix '" + matrix.GetName() + "' will now be solved via the Best Responce Enumeration", matrix.GetName());
             solvingConnection = true;
 
-            Queue<Matrix> matrixQueue = new Queue<Matrix>();
+            Queue<GameTheoryMatrix> matrixQueue = new Queue<GameTheoryMatrix>();
             matrixQueue.Enqueue(matrix);
 
-            List<Matrix> visitedMatricies = new List<Matrix>();//track visited matricies to prevent cycles
+            List<GameTheoryMatrix> visitedMatricies = new List<GameTheoryMatrix>();//track visited matricies to prevent cycles
 
-            List<Matrix> finalMatricies = new List<Matrix>();
+            List<GameTheoryMatrix> finalMatricies = new List<GameTheoryMatrix>();
 
             while (matrixQueue.Count > 0)
             {
@@ -1842,7 +1035,7 @@ namespace Game_Theory_Calculator
 
                 foreach (Point cell in NashEqualibriaCells)
                 {
-                    Matrix nextMatrix = GetNextConnectedMatrix(currentMatrix, cell.X, cell.Y);
+                    GameTheoryMatrix nextMatrix = GetNextConnectedMatrix(currentMatrix, cell.X, cell.Y);
 
                     //enqueue all existing connections
                     if (nextMatrix != null)
@@ -1870,7 +1063,7 @@ namespace Game_Theory_Calculator
                 string combinedOutput = null;
 
                 //combine all outcomes and present in one window
-                foreach (Matrix finalMatrix in finalMatricies)
+                foreach (GameTheoryMatrix finalMatrix in finalMatricies)
                 {
                     if (finalMatrix.GetNashEqualibria().Count > 0)
                     {
@@ -1886,7 +1079,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine returns a list of cells which are the Nash Equalibria
-        private List<Point> GetNashEquilibriaCells(Matrix matrix)
+        private List<Point> GetNashEquilibriaCells(GameTheoryMatrix matrix)
         {
             List<Point> nashEquilibria = new List<Point>();
 
@@ -1904,7 +1097,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine determines the matrix that is connected to the matrix passed as a parameter
-        private Matrix GetNextConnectedMatrix(Matrix originMatrix, int row, int col)
+        private GameTheoryMatrix GetNextConnectedMatrix(GameTheoryMatrix originMatrix, int row, int col)
         {
             foreach (Connection connection in existingConnections)
             {
@@ -1912,7 +1105,7 @@ namespace Game_Theory_Calculator
 
                 if (link != null && link.First != null && link.First.Next != null)
                 {
-                    return (Matrix)link.First.Next.Value.GetModelReference();
+                    return (GameTheoryMatrix)link.First.Next.Value.GetModelReference();
                 }
             }
 
@@ -1931,7 +1124,7 @@ namespace Game_Theory_Calculator
         // This subroutine moves all existing matricies as close to the origin as possible and avoids matricies overlapping
         private void lockalise_matricies_Click(object sender, EventArgs e)
         {
-            foreach (Matrix matrix in savedMaticies)
+            foreach (GameTheoryMatrix matrix in savedMaticies)
             {
                 matrix.SetX(150);
                 matrix.SetY(80);
@@ -1995,7 +1188,7 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine initiates the selection of a matrix
-        public void select_Matrix()
+        private void select_Matrix()
         {
             //first i have to identify what matrix to solve, if there are more than 1, user will have to select which one
             currentMatrix = null;

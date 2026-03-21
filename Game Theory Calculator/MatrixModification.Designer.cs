@@ -61,7 +61,7 @@
             this.MatrixBlueprint.Name = "MatrixBlueprint";
             this.MatrixBlueprint.RowHeadersWidth = 85;
             this.MatrixBlueprint.RowTemplate.Height = 33;
-            this.MatrixBlueprint.Size = new System.Drawing.Size(1169, 619);
+            this.MatrixBlueprint.Size = new System.Drawing.Size(1206, 592);
             this.MatrixBlueprint.TabIndex = 0;
             // 
             // Column1
@@ -79,7 +79,7 @@
             // SaveChanges
             // 
             this.SaveChanges.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.SaveChanges.Location = new System.Drawing.Point(1043, 559);
+            this.SaveChanges.Location = new System.Drawing.Point(1062, 532);
             this.SaveChanges.Name = "SaveChanges";
             this.SaveChanges.Size = new System.Drawing.Size(114, 48);
             this.SaveChanges.TabIndex = 1;
@@ -90,7 +90,7 @@
             // AddRow
             // 
             this.AddRow.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.AddRow.Location = new System.Drawing.Point(33, 507);
+            this.AddRow.Location = new System.Drawing.Point(52, 480);
             this.AddRow.Name = "AddRow";
             this.AddRow.Size = new System.Drawing.Size(132, 35);
             this.AddRow.TabIndex = 2;
@@ -101,7 +101,7 @@
             // DeleteRow
             // 
             this.DeleteRow.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.DeleteRow.Location = new System.Drawing.Point(22, 553);
+            this.DeleteRow.Location = new System.Drawing.Point(41, 526);
             this.DeleteRow.Name = "DeleteRow";
             this.DeleteRow.Size = new System.Drawing.Size(153, 35);
             this.DeleteRow.TabIndex = 3;
@@ -112,7 +112,7 @@
             // AddColumn
             // 
             this.AddColumn.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.AddColumn.Location = new System.Drawing.Point(232, 507);
+            this.AddColumn.Location = new System.Drawing.Point(251, 480);
             this.AddColumn.Name = "AddColumn";
             this.AddColumn.Size = new System.Drawing.Size(169, 35);
             this.AddColumn.TabIndex = 4;
@@ -123,7 +123,7 @@
             // DeleteColumn
             // 
             this.DeleteColumn.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.DeleteColumn.Location = new System.Drawing.Point(217, 553);
+            this.DeleteColumn.Location = new System.Drawing.Point(236, 526);
             this.DeleteColumn.Name = "DeleteColumn";
             this.DeleteColumn.Size = new System.Drawing.Size(193, 35);
             this.DeleteColumn.TabIndex = 5;
@@ -134,7 +134,7 @@
             // DeleteMatrixButton
             // 
             this.DeleteMatrixButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.DeleteMatrixButton.Location = new System.Drawing.Point(744, 559);
+            this.DeleteMatrixButton.Location = new System.Drawing.Point(763, 532);
             this.DeleteMatrixButton.Name = "DeleteMatrixButton";
             this.DeleteMatrixButton.Size = new System.Drawing.Size(185, 48);
             this.DeleteMatrixButton.TabIndex = 8;
@@ -147,7 +147,7 @@
             this.saved_back.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.saved_back.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("saved_back.BackgroundImage")));
             this.saved_back.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.saved_back.Location = new System.Drawing.Point(951, 556);
+            this.saved_back.Location = new System.Drawing.Point(970, 529);
             this.saved_back.Name = "saved_back";
             this.saved_back.Size = new System.Drawing.Size(69, 54);
             this.saved_back.TabIndex = 9;
@@ -156,9 +156,9 @@
             // 
             // MatrixModification
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1169, 619);
+            this.ClientSize = new System.Drawing.Size(1206, 592);
             this.Controls.Add(this.saved_back);
             this.Controls.Add(this.DeleteMatrixButton);
             this.Controls.Add(this.DeleteColumn);

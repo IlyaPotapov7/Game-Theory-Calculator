@@ -8,7 +8,7 @@ namespace Game_Theory_Calculator
     {
         // Global Variables
 
-        public mainWindow.Matrix currentMatrix = new mainWindow.Matrix();
+        public GameTheoryMatrix currentMatrix = new GameTheoryMatrix();
         public bool isSaved = false;
         public bool deleted = false;
         private string[] splitPayoff;
@@ -36,13 +36,13 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine copies the passed on matrix from the main window into the MatrixModification window
-        public void recieveMatrix(mainWindow.Matrix matrix)
+        public void recieveMatrix(GameTheoryMatrix matrix)
         {
             currentMatrix = copyMatrix(matrix);
         }
 
         // This subroutine displays the matrix moficiation form and updates it each time it is reloaded
-        public void DisplayMatrix(mainWindow.Matrix matrix)
+        public void DisplayMatrix(GameTheoryMatrix matrix)
         {
             currentMatrix = matrix;
 
@@ -205,9 +205,9 @@ namespace Game_Theory_Calculator
         }
 
         // This subroutine makes a hard copy of a matrix that is passed as a parametere
-        private mainWindow.Matrix copyMatrix(mainWindow.Matrix originalMatrix)
+        private GameTheoryMatrix copyMatrix(GameTheoryMatrix originalMatrix)
         {
-            mainWindow.Matrix updatedMatrix = new mainWindow.Matrix();
+            GameTheoryMatrix updatedMatrix = new GameTheoryMatrix();
 
             updatedMatrix.SetCols(originalMatrix.GetCols());
             updatedMatrix.SetRows(originalMatrix.GetRows());
