@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Game</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+  }
+  h1 {
+    margin-bottom: 10px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: #0f0;
+  }
+  #scoreboard {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+  #scoreboard span { color: #0f0; font-weight: bold; }
+  canvas {
+    border: 2px solid #0f0;
+    background: #16213e;
+    display: block;
+  }
+  #message {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    height: 1.4rem;
+    color: #aaa;
+  }
+</style>
+</head>
+<body>
+
+<h1>SNAKE</h1>
+<div id="scoreboard">
+  <div>Score: <span id="score">0</span></div>
+  <div>Best: <span id="best">0</span></div>
+</div>
+<canvas id="game" width="400" height="400"></canvas>
+<div id="message">Press any arrow key or WASD to start</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const bestEl = document.getElementById('best');
+const messageEl = document.getElementById('message');
+
+const GRID = 20;
+const COLS = canvas.width / GRID;
+const ROWS = canvas.height / GRID;
+const TICK_MS = 110;
+
+let snake, dir, nextDir, food, score, bestScore, running, gameOver;
+
+bestScore = parseInt(localStorage.getItem('snakeBest') || '0', 10);
+bestEl.textContent = bestScore;
+
+function init() {
+  const midX = Math.floor(COLS / 2);
+  const midY = Math.floor(ROWS / 2);
+  snake = [
+    { x: midX, y: midY },
+    { x: midX - 1, y: midY },
+    { x: midX - 2, y: midY }
+  ];
+  dir = { x: 1, y: 0 };
+  nextDir = { x: 1, y: 0 };
+  score = 0;
+  scoreEl.textContent = score;
+  running = false;
+  gameOver = false;
+  placeFood();
+  draw();
+  messageEl.textContent = 'Press any arrow key or WASD to start';
+}
+
+function placeFood() {
+  let pos;
+  do {
+    pos = {
+      x: Math.floor(Math.random() * COLS),
+      y: Math.floor(Math.random() * ROWS)
+    };
+  } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+  food = pos;
+}
+
+function update() {
+  dir = { ...nextDir };
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+  // Wall collision
+  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+    endGame();
+    return;
+  }
+
+  // Self collision
+  if (snake.some(s => s.x === head.x && s.y === head.y)) {
+    endGame();
+    return;
+  }
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    scoreEl.textContent = score;
+    if (score > bestScore) {
+      bestScore = score;
+      bestEl.textContent = bestScore;
+      localStorage.setItem('snakeBest', bestScore);
+    }
+    placeFood();
+  } else {
+    snake.pop();
+  }
+}
+
+function draw() {
+  // Background
+  ctx.fillStyle = '#16213e';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Grid lines (subtle)
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  for (let x = 0; x <= COLS; x++) {
+    ctx.beginPath();
+    ctx.moveTo(x * GRID, 0);
+    ctx.lineTo(x * GRID, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= ROWS; y++) {
+    ctx.beginPath();
+    ctx.moveTo(0, y * GRID);
+    ctx.lineTo(canvas.width, y * GRID);
+    ctx.stroke();
+  }
+
+  // Food
+  ctx.fillStyle = '#e94560';
+  ctx.shadowColor = '#e94560';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(
+    food.x * GRID + GRID / 2,
+    food.y * GRID + GRID / 2,
+    GRID / 2 - 2, 0, Math.PI * 2
+  );
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Snake
+  snake.forEach((seg, i) => {
+    const ratio = 1 - i / snake.length;
+    const g = Math.floor(180 + 75 * ratio);
+    ctx.fillStyle = `rgb(0, ${g}, 0)`;
+    ctx.shadowColor = '#0f0';
+    ctx.shadowBlur = i === 0 ? 8 : 0;
+    const pad = i === 0 ? 1 : 2;
+    ctx.fillRect(
+      seg.x * GRID + pad,
+      seg.y * GRID + pad,
+      GRID - pad * 2,
+      GRID - pad * 2
+    );
+  });
+  ctx.shadowBlur = 0;
+
+  // Game over overlay
+  if (gameOver) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#e94560';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
+    ctx.fillStyle = '#eee';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 25);
+  }
+}
+
+function endGame() {
+  gameOver = true;
+  running = false;
+  draw();
+  messageEl.textContent = 'Press any arrow key or WASD to restart';
+}
+
+let lastTick = 0;
+function loop(timestamp) {
+  if (!running) return;
+  if (timestamp - lastTick >= TICK_MS) {
+    lastTick = timestamp;
+    update();
+    draw();
+  }
+  if (running) requestAnimationFrame(loop);
+}
+
+function startGame() {
+  running = true;
+  lastTick = performance.now();
+  messageEl.textContent = '';
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener('keydown', e => {
+  const keyMap = {
+    ArrowUp:    { x: 0, y: -1 },
+    ArrowDown:  { x: 0, y: 1 },
+    ArrowLeft:  { x: -1, y: 0 },
+    ArrowRight: { x: 1, y: 0 },
+    w: { x: 0, y: -1 },
+    s: { x: 0, y: 1 },
+    a: { x: -1, y: 0 },
+    d: { x: 1, y: 0 },
+    W: { x: 0, y: -1 },
+    S: { x: 0, y: 1 },
+    A: { x: -1, y: 0 },
+    D: { x: 1, y: 0 },
+  };
+
+  const newDir = keyMap[e.key];
+  if (!newDir) return;
+  e.preventDefault();
+
+  // Prevent 180-degree turns
+  if (newDir.x + dir.x === 0 && newDir.y + dir.y === 0) return;
+
+  nextDir = newDir;
+
+  if (gameOver) {
+    init();
+    // Apply the pressed direction
+    nextDir = newDir;
+    dir = newDir;
+    startGame();
+  } else if (!running) {
+    nextDir = newDir;
+    dir = newDir;
+    startGame();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
